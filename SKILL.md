@@ -99,12 +99,14 @@ Click the **"Deploy"** button. Railway will:
 - **First user is owner**: Register immediately after deploy to claim ownership.
 - **Private deployment**: Set `SIGNUP_ALLOWLIST` before the first API start.
 - **Sandbox provider**: Without a key, the product boots and bots chat, but computer tools are unavailable.
-- **Railway trial**: Free tier provides $5.00 or 30 days.
+- **Railway trial**: Free tier provides $5.00 or 30 days. **Note: The free plan may not have enough resources to provision all 4 services (web, api, worker, postgres). If you see "Free plan resource provision limit exceeded", upgrade to a paid plan (Hobby $5/mo or Pro) before deploying.**
+- **Resource requirements**: The template deploys 4 services. The free tier's resource limits may be insufficient. Consider the Hobby plan ($5/month) or higher.
 
 ## Common Issues
 
 | Issue | Solution |
 |-------|----------|
+| Free plan resource limit exceeded | Railway free tier cannot provision 4 services; upgrade to Hobby ($5/mo) or Pro plan |
 | API container exits immediately | Check `POSTGRES_PASSWORD` is set and Postgres healthcheck passes |
 | Bots can't use computer tools | Set `SANDBOX_PROVIDER` and matching API key |
 | Can't sign up | Check `SIGNUPS_ENABLED` is true and `SIGNUP_ALLOWLIST` if set |
