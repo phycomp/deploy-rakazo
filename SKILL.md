@@ -1,0 +1,121 @@
+---
+name: deploy-zakaro
+description: "Use when deploying Rakazo (persistent AI teammates platform) on Railway — one-click template deployment, environment variable configuration, and post-deploy verification."
+---
+
+# Deploy Rakazo on Railway
+
+## Overview
+
+Rakazo is an open-source platform for persistent AI teammates with memory, routines, and their own computers (browser, terminal, files, graphical desktop). This skill documents the end-to-end deployment on Railway using the official template.
+
+**Core principle:** Deploy the full stack (web, api, worker, postgres) via Railway's one-click template, configure the optional model/sandbox keys, and verify the first user registration.
+
+## Prerequisites
+
+- A Railway account (sign up at https://railway.com)
+- (Optional) OpenRouter API Key (https://openrouter.ai) for out-of-the-box model access
+- (Optional) Sandbox provider API Key (E2B, Daytona, or Box) for bot computer capabilities
+
+## Deployment Steps
+
+### 1. Open the Railway Template
+
+Navigate to the Rakazo template page:
+
+```
+https://railway.com/deploy/rakazo
+```
+
+Or directly to the deploy wizard:
+
+```
+https://railway.com/new/template/rakazo
+```
+
+### 2. Sign In to Railway
+
+Railway supports three login methods:
+- **Continue with GitHub** (recommended — also grants repo access for template sources)
+- **Continue with Google**
+- **Log in using email**
+
+Click "Login" on the deploy page, then choose your preferred method.
+
+### 3. Review the Template
+
+The template deploys four services:
+
+| Service | Image | Role |
+|---------|-------|------|
+| `web` | `ghcr.io/elie222/rakazo/app:v0.3.3` | Public web app (Vite preview, port 5173) |
+| `api` | `monotykamary/railway-template-rakazo` | Hono API server (port from PORT env) |
+| `worker` | `monotykamary/railway-template-rakazo` | Graphile Worker (routines, wakeups) |
+| `postgres` | `railwayapp-templates/postgres-ssl:18` | PostgreSQL 18 datastore |
+
+### 4. Configure Environment Variables
+
+#### Required (auto-generated — do not edit)
+- `BETTER_AUTH_SECRET` — signing secret for auth sessions
+- `ENCRYPTION_KEY` — AES key for stored credentials (never regenerate after first deploy)
+- `SCREEN_PROXY_SECRET` — shared signing secret for browser-screen capabilities
+- `POSTGRES_PASSWORD` — auto-generated Postgres password
+- `DATABASE_URL` — auto-wired Postgres connection string
+
+#### Optional but Recommended
+- `OPENROUTER_API_KEY` — model key so bots work out of the box (users can also connect models per-user in the UI)
+- `SANDBOX_PROVIDER` — `e2b`, `daytona`, `box`, or `none` (default: `e2b`)
+- `E2B_API_KEY` / `DAYTONA_API_KEY` / `BOX_API_KEY` — matching key for the chosen provider
+- `SIGNUP_ALLOWLIST` — comma-separated emails/domains allowed to sign up (configure before first API start to keep deployment private)
+- `SMTP_URL` — optional SMTP URL for password recovery
+- `EMAIL_FROM` — optional From header for outgoing email
+- `COMPOSIO_API_KEY` — optional Composio key for managed plugin catalog
+
+#### Do Not Edit (auto-wired)
+- `API_URL`, `WEB_ORIGIN`, `BETTER_AUTH_URL`, `RAKAZO_HOST` — wired to the web service domain
+- `API_PROXY_TARGET` — private API endpoint
+- `DATABASE_URL` — Postgres connection string
+- `DATA_DIR` — writable directory for bot workspace checkpoints
+
+### 5. Deploy
+
+Click the **"Deploy"** button. Railway will:
+1. Provision all four services
+2. Run database migrations (`prisma migrate deploy`)
+3. Health-check the API at `GET /health`
+4. Assign a public domain to the web service
+
+### 6. Post-Deploy Verification
+
+1. **Register the first user immediately.** The first registered user becomes the deployment owner.
+2. Access the web URL provided by Railway (e.g., `https://xxx.railway.app`).
+3. Sign up with your email.
+4. Verify the API health endpoint: `https://xxx.railway.app/health` should return OK.
+5. (Optional) Test bot creation and a simple conversation.
+
+### 7. Important Notes
+
+- **ENCRYPTION_KEY**: Never regenerate after the first start — stored credentials would become undecryptable.
+- **First user is owner**: Register immediately after deploy to claim ownership.
+- **Private deployment**: Set `SIGNUP_ALLOWLIST` before the first API start.
+- **Sandbox provider**: Without a key, the product boots and bots chat, but computer tools are unavailable.
+- **Railway trial**: Free tier provides $5.00 or 30 days.
+
+## Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| API container exits immediately | Check `POSTGRES_PASSWORD` is set and Postgres healthcheck passes |
+| Bots can't use computer tools | Set `SANDBOX_PROVIDER` and matching API key |
+| Can't sign up | Check `SIGNUPS_ENABLED` is true and `SIGNUP_ALLOWLIST` if set |
+| Stored credentials undecryptable | ENCRYPTION_KEY was regenerated — restore from backup |
+
+## Quick Reference
+
+```
+Template URL:  https://railway.com/deploy/rakazo
+Deploy URL:    https://railway.com/new/template/rakazo
+Station:       https://station.railway.com/all-templates/49594aec-af0d-44fd-b143-ce05be3dd1e9
+Source:        https://github.com/elie222/rakazo
+Image:         ghcr.io/elie222/rakazo/app:v0.3.3
+```
