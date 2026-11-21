@@ -102,6 +102,42 @@ Click the **"Deploy"** button. Railway will:
 - **Railway trial**: Free tier provides $5.00 or 30 days. **Note: The free plan may not have enough resources to provision all 4 services (web, api, worker, postgres). If you see "Free plan resource provision limit exceeded", upgrade to a paid plan (Hobby $5/mo or Pro) before deploying.**
 - **Resource requirements**: The template deploys 4 services. The free tier's resource limits may be insufficient. Consider the Hobby plan ($5/month) or higher.
 
+### 8. Alternative: External Postgres (3 services, no Postgres on Railway)
+
+If the free plan's 3-service limit is insufficient for all 4 services, use an external Postgres database:
+
+**Free external Postgres providers:**
+- [Neon](https://neon.tech) — free tier, 0.5 GB storage
+- [Supabase](https://supabase.com) — free tier, 500 MB
+
+**Steps:**
+1. Create a database on the external provider
+2. Get the connection string: `postgresql://user:pass@host:port/dbname?sslmode=require`
+3. Deploy only `web`, `api`, `worker` on Railway (3 services)
+4. Set `DATABASE_URL` in both `api` and `worker` to the external connection string
+5. Ensure `ENCRYPTION_KEY` is shared between `api` and `worker`
+
+**Resource requirements (minimum):**
+| Service | Min RAM | Recommended |
+|---------|---------|-------------|
+| web (Vite) | 128 MB | 256 MB |
+| api (Hono) | 256 MB | 512 MB |
+| worker (Graphile) | 256 MB | 512 MB |
+
+### 9. Alternative: Docker Compose Self-Hosting
+
+For full control over resources, deploy on your own server:
+
+```bash
+git clone https://github.com/elie222/rakazo.git
+cd rakazo/infra/compose
+cp .env.example .env
+# Edit .env: set POSTGRES_PASSWORD, OPENROUTER_API_KEY, etc.
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+Requirements: Linux server, Docker + Docker Compose, 4 GB RAM / 2 CPU minimum (8 GB recommended).
+
 ## Common Issues
 
 | Issue | Solution |
