@@ -138,7 +138,31 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 Requirements: Linux server, Docker + Docker Compose, 4 GB RAM / 2 CPU minimum (8 GB recommended).
 
-## Common Issues
+### 10. Alternative: GitHub Codespaces as External Postgres
+
+Use a GitHub Codespace to run Postgres as an external database for Railway:
+
+**Setup:**
+1. Go to https://github.com/phycomp/codespaces
+2. Click "Code" → "Codespaces" → "Create codespace on main"
+3. Choose 4+ cores, 8GB+ RAM machine
+4. Wait for the setup script to complete (installs Rakazo + Postgres)
+5. In the Codespace terminal, get the Postgres connection string:
+   ```bash
+   # Postgres runs on port 5432 inside the Codespace
+   # Use the Codespace's forwarded port URL
+   echo "postgresql://postgres:password@localhost:5432/rakazo?sslmode=disable"
+   ```
+6. Make port 5432 public in the Codespace "Ports" tab
+7. Use the forwarded URL as `DATABASE_URL` in Railway
+
+**Limitations:**
+- Codespaces sleep after 30 min of inactivity
+- Codespaces are deleted after 30 days of inactivity
+- Free tier: 60 hours/month for 2-core, 120 hours for 4-core
+- Not suitable for production; use for development/testing only
+
+**Recommended:** Use Neon (https://neon.tech) or Supabase (https://supabase.com) for a permanent free Postgres database instead.
 
 | Issue | Solution |
 |-------|----------|
