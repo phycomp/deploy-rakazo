@@ -1,4 +1,4 @@
-# deploy-zakaro
+# deploy-rakazo
 
 A skill for deploying [Rakazo](https://github.com/elie222/rakazo) — an open-source platform for persistent AI teammates with memory, routines, and their own computers — on [Railway](https://railway.com) using the official one-click template.
 

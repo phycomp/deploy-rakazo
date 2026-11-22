@@ -1,5 +1,5 @@
 ---
-name: deploy-zakaro
+name: deploy-rakazo
 description: "Use when deploying Rakazo (persistent AI teammates platform) on Railway — one-click template deployment, environment variable configuration, and post-deploy verification."
 ---
 
